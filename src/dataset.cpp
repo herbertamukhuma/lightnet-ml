@@ -76,6 +76,54 @@ void Dataset::print()
     }
 }
 
+void Dataset::printTargets()
+{
+    std::vector<double> targets = getTargets();
+
+    for(double &target : targets){
+        std::cout << target << std::endl;
+    }
+}
+
+void Dataset::printUniqueTargets()
+{
+    std::vector<double> uniqueTargets = getUniqueTargets();
+
+    for(double &uniqueTarget : uniqueTargets){
+        std::cout << uniqueTarget << std::endl;
+    }
+}
+
+std::vector<double> Dataset::getTargets()
+{
+    std::vector<double> targets;
+
+    // targets are in the last column
+    for(std::vector<double> &row : data){
+        targets.push_back(row[row.size()-1]);
+    }
+
+    return targets;
+}
+
+std::vector<double> Dataset::getUniqueTargets()
+{
+    std::vector<double> uniqueTargets;
+
+    // targets are in the last column
+    for(std::vector<double> &row : data){
+
+        double target = row[row.size()-1];
+
+        if(std::count(uniqueTargets.begin(), uniqueTargets.end(), target) < 1){
+            uniqueTargets.push_back(target);
+        }
+
+    }
+
+    return uniqueTargets;
+}
+
 bool Dataset::validateDataset()
 {
 

@@ -20,6 +20,14 @@ public:
 
     void print();
 
+    void printTargets();
+
+    void printUniqueTargets();
+
+    std::vector<double> getTargets();
+
+    std::vector<double> getUniqueTargets();
+
 private:
     bool loaded = false;
 

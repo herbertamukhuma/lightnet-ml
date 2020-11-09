@@ -15,7 +15,7 @@ int main()
 
 //    layer.print();
 
-    Dataset dataset("F:/GitHub/lightnet-ml/data/embeddings.csv");
-    dataset.print();
+    Dataset dataset("/Users/user/GitHub/lightnet-ml/data/embeddings.csv");
+    dataset.printUniqueTargets();
     return 0;
 }
