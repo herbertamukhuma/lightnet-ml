@@ -3,6 +3,10 @@
 
 #include <stdlib.h>
 #include <vector>
+#include <iostream>
+
+#include "mathutil.h"
+#include "util.h"
 
 namespace LightNet {
 
@@ -11,18 +15,42 @@ class Neuron
 public:
     Neuron();
 
+    enum WeightUpdateDirection{
+        Up = 0,
+        Down = 1
+    };
+
     static double generateRandomWeight();
 
-    void addInputWeight(double weight);
+    void addWeight(double weight);
 
-    std::vector<double> getInputWeights() const;
+    void addActivation(double output);
+
+    std::vector<double> getWeights() const;
+
+    std::vector<double> getActivations() const;
+
+    void clearActivations();
+
+    double compute(MathUtil::Activation_Func activationFunc);
+
+    double getOutput() const;
+
+    void updateWeight(size_t index, double newWeight);
+
+    void setBias(double value);
+
+    double getBias() const;
 
 protected:
-    std::vector<double> inputWeights;
+    std::vector<double> weights;
 
-    double outputValue;
+    std::vector<double> inputActivations;
 
-    std::vector<double> inputValues;
+    double output = 0;
+
+    double bias;
+
 };
 
 }

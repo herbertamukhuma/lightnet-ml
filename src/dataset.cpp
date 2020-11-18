@@ -55,7 +55,7 @@ bool Dataset::isLoaded() const
 
 void Dataset::print()
 {
-    std::cout << "Dataset => rows: " << data.size() << " columns: " << data[0].size() << "\n" << std::endl;
+    std::cout << "Dataset => rows: " << getRowCount() << " columns: " << getColumnCount() << "\n" << std::endl;
 
     for(std::vector<double> &row : data){
 
@@ -122,6 +122,34 @@ std::vector<double> Dataset::getUniqueTargets()
     }
 
     return uniqueTargets;
+}
+
+std::vector<double> Dataset::getInputs(size_t rowIndex)
+{
+    std::vector<double> row = data[rowIndex];
+    row.pop_back();
+    return row;
+}
+
+double Dataset::getTarget(size_t rowIndex)
+{
+    std::vector<double> row = data[rowIndex];
+    return row[row.size()-1];
+}
+
+size_t Dataset::getInputCount()
+{
+    return getColumnCount() - 1;
+}
+
+size_t Dataset::getRowCount()
+{
+    return data.size();
+}
+
+size_t Dataset::getColumnCount()
+{
+    return data[0].size();
 }
 
 bool Dataset::validateDataset()

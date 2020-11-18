@@ -28,6 +28,16 @@ public:
 
     std::vector<double> getUniqueTargets();
 
+    std::vector<double> getInputs(size_t rowIndex);
+
+    double getTarget(size_t rowIndex);
+
+    size_t getInputCount();
+
+    size_t getRowCount();
+
+    size_t getColumnCount();
+
 private:
     bool loaded = false;
 

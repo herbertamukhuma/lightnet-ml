@@ -2,6 +2,7 @@
 
 #include "src/neuralnetwork.h"
 #include "src/dataset.h"
+#include "src/mathutil.h"
 
 using namespace std;
 using namespace LightNet;
@@ -9,13 +10,12 @@ using namespace LightNet;
 int main()
 {
 
-//    NeuralNetwork net({128, 6, 4});
-
-//    Layer layer = net.getLayers()[1];
-
-//    layer.print();
-
     Dataset dataset("/Users/user/GitHub/lightnet-ml/data/embeddings.csv");
-    dataset.printUniqueTargets();
+
+    NeuralNetwork net({dataset.getInputCount(), 1, 4}, dataset);
+    net.train(10);
+
+    cout << "done" << std::endl;
+
     return 0;
 }
