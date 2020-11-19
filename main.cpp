@@ -10,12 +10,16 @@ using namespace LightNet;
 int main()
 {
 
-    Dataset dataset("/Users/user/GitHub/lightnet-ml/data/embeddings.csv");
+    Dataset dataset("/Users/user/GitHub/lightnet-ml/data/embeddings.csv", true);
 
-    NeuralNetwork net({dataset.getInputCount(), 1, 4}, dataset);
-    net.train(10);
+    dataset.scale();
 
-    cout << "done" << std::endl;
+    dataset.print();
+
+//    NeuralNetwork net({dataset.getInputCount(), dataset.getUniqueTargetCount()}, dataset);
+//    net.train(100);
+
+    std::cout << "done" << std::endl;
 
     return 0;
 }

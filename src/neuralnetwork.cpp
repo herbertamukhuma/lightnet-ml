@@ -26,7 +26,6 @@ void NeuralNetwork::train(size_t iterations)
         std::vector<double> losses;
 
         for(size_t x = 0; x < dataset.getRowCount(); x++){
-
             feedForward(dataset.getInputs(x));
             losses.push_back(computeLoss(dataset.getTarget(x)));
             backPropagation(dataset.getTarget(x));
@@ -34,6 +33,20 @@ void NeuralNetwork::train(size_t iterations)
 
         std::cout << " -- loss #" << i + 1 << ": " << MathUtil::mean(losses) << std::endl;
     }
+
+}
+
+void NeuralNetwork::printOutputs()
+{
+    Layer &outputLayer = layers[layers.size() - 1];
+
+    std::cout << " -- Outputs: ";
+
+    for(Neuron &neuron : outputLayer.getNeurons()){
+        std::cout << neuron.getOutput() << " ";
+    }
+
+    std::cout << std::endl;
 
 }
 
@@ -68,12 +81,7 @@ void NeuralNetwork::feedForward(std::vector<double> activations)
         layer.setActivations(activations, counter);
 
         // compute the outputs for this layer, which will be the activations for the next layer
-        if(counter == layers.size() - 1){
-            // for the last layer, we use sigmoid as the activation funtion to obtain activations from 0 to 1
-            activations = layer.compute(MathUtil::Sigmoid);
-        }else {
-            activations = layer.compute(MathUtil::ReLU);
-        }
+        activations = layer.compute();
 
         counter++;
     }
@@ -132,9 +140,9 @@ void NeuralNetwork::backPropagation(double target)
         double costFuncDeriv;
 
         if((size_t)targetNeuronIndex == i){
-            costFuncDeriv = (-2 / outputNeuronCount) * (1.0 - outputLayer.getNeurons()[i].getOutput());
+            costFuncDeriv = (-2.0 / outputNeuronCount) * (1.0 - outputLayer.getNeurons()[i].getOutput());
         }else {
-            costFuncDeriv = (-2 / outputNeuronCount) * (0.0 - outputLayer.getNeurons()[i].getOutput());
+            costFuncDeriv = (-2.0 / outputNeuronCount) * (0.0 - outputLayer.getNeurons()[i].getOutput());
         }
 
         costFuncDerivs.push_back(costFuncDeriv);
@@ -195,6 +203,12 @@ void NeuralNetwork::backPropagation(double target)
 
             for(Neuron &neuron : neurons){
 
+                double cumulativeDeriv = 0.0;
+
+                for(std::vector<double> cumulativeWeightDerivs : prevNeuronsCumulativeWeightDerivs){
+                    cumulativeDeriv += cumulativeWeightDerivs[neuronCounter];
+                }
+
                 std::vector<double> weights = neuron.getWeights();
                 std::vector<double> activations = neuron.getActivations();
 
@@ -202,19 +216,13 @@ void NeuralNetwork::backPropagation(double target)
 
                 for(double weight : weights){
 
-                    double cumulativeDeriv = 0.0;
-
-                    for(std::vector<double> cumulativeWeightDerivs : prevNeuronsCumulativeWeightDerivs){
-                        cumulativeDeriv += cumulativeWeightDerivs[neuronCounter];
-                    }
-
-                    double weightDeriv = cumulativeDeriv * MathUtil::reluDeriv(neuron.getOutput()) * activations[weightCounter];
-
-                    cumulativeDeriv = cumulativeDeriv * MathUtil::reluDeriv(neuron.getOutput()) * weight;
-                    currentNeuronsCumulativeWeightDerivs[neuronCounter].push_back(cumulativeDeriv);
+                    double weightDeriv = cumulativeDeriv * MathUtil::sigmoidDeriv(neuron.getOutput()) * activations[weightCounter];
 
                     double newWeight = weight - (LEARNING_RATE * weightDeriv);
                     layer.updateWeight(neuronCounter, weightCounter, newWeight);
+
+                    double nextCumulativeDeriv = cumulativeDeriv * MathUtil::sigmoidDeriv(neuron.getOutput()) * weight;
+                    currentNeuronsCumulativeWeightDerivs[neuronCounter].push_back(nextCumulativeDeriv);
 
                     weightCounter++;
                 }

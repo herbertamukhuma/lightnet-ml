@@ -13,19 +13,9 @@ double MathUtil::sum(std::vector<double> inputs)
     return sum;
 }
 
-double MathUtil::relu(double input)
-{
-    return std::max(0.0, input);
-}
-
 double MathUtil::sigmoid(double input)
 {
     return 1 / (1 + exp(-input));
-}
-
-double MathUtil::fastSigmoid(double input)
-{
-    return input / (1 + abs(input));
 }
 
 double MathUtil::mse(std::vector<std::tuple<double, double> > inputPairs)
@@ -60,18 +50,27 @@ double MathUtil::maxElement(std::vector<double> elements)
     return max;
 }
 
+double MathUtil::minElement(std::vector<double> elements)
+{
+    double min = elements[0];
+
+    for(double element : elements){
+        if(element < min){
+            min = element;
+        }
+    }
+
+    return min;
+}
+
 double MathUtil::sigmoidDeriv(double value)
 {
     return value * (1.0 - value);
 }
 
-double MathUtil::reluDeriv(double value)
+double MathUtil::minMaxNormalization(double inputElement, double minElement, double maxElement)
 {
-    if(value > 0.0){
-        return 1.0;
-    }else {
-        return 0.0;
-    }
+    return (inputElement - minElement) / (maxElement - minElement);
 }
 
 // end of namespace

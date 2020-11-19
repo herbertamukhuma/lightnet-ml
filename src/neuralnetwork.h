@@ -21,8 +21,10 @@ public:
 
     void train(size_t iterations = 5);
 
+    void printOutputs();
+
 private:
-    const double LEARNING_RATE = 0.5;
+    const double LEARNING_RATE = 0.1;
 
     std::vector<Layer> layers;
     std::vector<size_t> architecture;

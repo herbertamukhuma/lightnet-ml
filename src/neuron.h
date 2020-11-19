@@ -32,7 +32,7 @@ public:
 
     void clearActivations();
 
-    double compute(MathUtil::Activation_Func activationFunc);
+    double compute();
 
     double getOutput() const;
 

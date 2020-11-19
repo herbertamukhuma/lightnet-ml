@@ -19,7 +19,7 @@ public:
 
     bool setActivations(std::vector<double> activations, size_t positionInNet);
 
-    std::vector<double> compute(MathUtil::Activation_Func activationFunc);
+    std::vector<double> compute();
 
     std::vector<LightNet::Neuron> getNeurons() const;
 

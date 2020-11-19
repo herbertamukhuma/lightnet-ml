@@ -37,7 +37,7 @@ void Neuron::clearActivations()
     inputActivations.clear();
 }
 
-double Neuron::compute(MathUtil::Activation_Func activationFunc)
+double Neuron::compute()
 {
     std::vector<double> activationWeightProducts;
 
@@ -51,16 +51,7 @@ double Neuron::compute(MathUtil::Activation_Func activationFunc)
 
     double sum = MathUtil::sum(activationWeightProducts); // + bias;
 
-    if(activationFunc == MathUtil::ReLU){
-        output = MathUtil::relu(sum);
-    }else if (activationFunc == MathUtil::Sigmoid) {
-        output = MathUtil::sigmoid(sum);
-    }else if(activationFunc == MathUtil::fastSigmoid(sum)){
-        output = MathUtil::fastSigmoid(sum);
-    }else {
-        // default to relu
-        output = MathUtil::relu(sum);
-    }
+    output = MathUtil::sigmoid(sum);
 
     return output;
 

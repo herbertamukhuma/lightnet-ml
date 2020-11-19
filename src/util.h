@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <string>
 
 namespace LightNet {
 
@@ -12,6 +13,9 @@ public:
     Util();
 
     static int find(std::vector<double> haystack, double needle);
+
+    static int find(std::vector<std::string> haystack, std::string needle);
+
 };
 
 }

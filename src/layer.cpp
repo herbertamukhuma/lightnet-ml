@@ -75,12 +75,12 @@ bool Layer::setActivations(std::vector<double> activations, size_t positionInNet
     return true;
 }
 
-std::vector<double> Layer::compute(MathUtil::Activation_Func activationFunc)
+std::vector<double> Layer::compute()
 {
     std::vector<double> computedNeuronOutputs;
 
     for(Neuron &neuron : neurons){
-        computedNeuronOutputs.push_back(neuron.compute(activationFunc));
+        computedNeuronOutputs.push_back(neuron.compute());
     }
 
     return  computedNeuronOutputs;
@@ -109,7 +109,7 @@ std::vector<LightNet::Neuron> Layer::getNeurons() const
 
 void Layer::updateWeight(size_t neuronIndex, size_t weightIndex, double newWeight)
 {
-    neurons[neuronIndex].updateWeight(weightIndex, newWeight);
+    neurons.at(neuronIndex).updateWeight(weightIndex, newWeight);
 }
 
 void Layer::updateBias(size_t neuronIndex, double newBias)

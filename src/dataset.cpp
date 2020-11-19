@@ -2,13 +2,14 @@
 
 namespace LightNet {
 
-Dataset::Dataset(std::string filename)
+Dataset::Dataset(std::string filename, bool hasHeadings, char delimiter)
 {
-    load(filename);
+    load(filename, hasHeadings, delimiter);
 }
 
-void Dataset::load(std::string filename)
+void Dataset::load(std::string filename, bool hasHeadings, char delimiter)
 {
+
     std::fstream fin;
 
     fin.open(filename, std::ios::in);
@@ -18,9 +19,11 @@ void Dataset::load(std::string filename)
         return;
     }
 
-    std::vector<double> row;
+    std::vector<std::string> row;
 
     std::string line, word;
+
+    size_t rowCounter = 0;
 
     while (fin.good()) {
 
@@ -28,24 +31,59 @@ void Dataset::load(std::string filename)
 
         std::getline(fin, line);
 
-        std::stringstream s(line);
+        if(hasHeadings && rowCounter == 0){
+            // skip first row which has the headings
+        }else {
 
-        while(std::getline(s, word, ',')){
+            std::stringstream s(line);
 
-            if(word.empty()){
-                break;
+            while(std::getline(s, word, delimiter)){
+
+                if(word.empty()){
+                    break;
+                }
+
+                row.push_back(word);
             }
 
-            row.push_back(std::stod(word));
+            if(!row.empty()){
+                rawData.push_back(row);
+            }
         }
 
-        if(!row.empty()){
-            data.push_back(row);
-        }
-
+        rowCounter++;
     }
 
+    encodeTargets();
+
     loaded = validateDataset();
+}
+
+void Dataset::encodeTargets()
+{
+    std::vector<std::string> uniqueUnencodedTargets = getUniqueUnencodedTargets();
+
+    for(std::vector<std::string> row : rawData){
+
+        std::vector<double> encodedRow;
+
+        size_t columnCounter = 0;
+
+        for(std::string column : row){
+
+            if(columnCounter == row.size() - 1){
+                double index = (double)Util::find(uniqueUnencodedTargets, column) + 1.0;
+                encodedRow.push_back(index);
+            }else {
+                encodedRow.push_back(std::stod(column));
+            }
+
+            columnCounter++;
+        }
+
+        data.push_back(encodedRow);
+
+    }
 }
 
 bool Dataset::isLoaded() const
@@ -124,6 +162,24 @@ std::vector<double> Dataset::getUniqueTargets()
     return uniqueTargets;
 }
 
+std::vector<std::string> Dataset::getUniqueUnencodedTargets()
+{
+    std::vector<std::string> uniqueTargets;
+
+    // targets are in the last column
+    for(std::vector<std::string> &row : rawData){
+
+        std::string target = row[row.size()-1];
+
+        if(std::count(uniqueTargets.begin(), uniqueTargets.end(), target) < 1){
+            uniqueTargets.push_back(target);
+        }
+
+    }
+
+    return uniqueTargets;
+}
+
 std::vector<double> Dataset::getInputs(size_t rowIndex)
 {
     std::vector<double> row = data[rowIndex];
@@ -142,6 +198,11 @@ size_t Dataset::getInputCount()
     return getColumnCount() - 1;
 }
 
+size_t Dataset::getUniqueTargetCount()
+{
+    return getUniqueTargets().size();
+}
+
 size_t Dataset::getRowCount()
 {
     return data.size();
@@ -150,6 +211,55 @@ size_t Dataset::getRowCount()
 size_t Dataset::getColumnCount()
 {
     return data[0].size();
+}
+
+void Dataset::scale()
+{
+    if(scaled) return;
+
+    std::vector<std::vector<double>> columns(getColumnCount(), std::vector<double>(getRowCount(), 0));
+
+    size_t rowCounter = 0;
+
+    for(std::vector<double> row : data){
+
+        size_t columnCounter = 0;
+
+        for(double cellValue : row){
+            columns[columnCounter][rowCounter] = cellValue;
+            columnCounter++;
+        }
+
+        rowCounter++;
+    }
+
+    //data = columns;
+
+    size_t columnCounter = 0;
+
+    for(std::vector<double> column : columns){
+
+        double minElement = MathUtil::minElement(column);
+        double maxElement = MathUtil::maxElement(column);
+
+        size_t rowCounter = 0;
+
+        for(double cellValue : column){
+
+            if(columnCounter == columns.size()-1){
+                data[rowCounter][columnCounter] = cellValue;
+            }else {
+                std::cout << cellValue << " " << minElement << " " << maxElement << std::endl;
+                data[rowCounter][columnCounter] = MathUtil::minMaxNormalization(cellValue, minElement, maxElement);
+            }
+
+            rowCounter++;
+        }
+
+        columnCounter++;
+    }
+
+    scaled = true;
 }
 
 bool Dataset::validateDataset()
