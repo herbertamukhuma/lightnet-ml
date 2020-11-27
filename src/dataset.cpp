@@ -7,6 +7,11 @@ Dataset::Dataset(std::string filename, bool hasHeadings, char delimiter)
     load(filename, hasHeadings, delimiter);
 }
 
+Dataset::Dataset(Matrix data, MatrixS rawData) : rawData(rawData), data(data)
+{
+
+}
+
 void Dataset::load(std::string filename, bool hasHeadings, char delimiter)
 {
 
@@ -193,6 +198,12 @@ double Dataset::getTarget(size_t rowIndex)
     return row[row.size()-1];
 }
 
+std::string Dataset::getUnencodedTarget(size_t rowIndex)
+{
+    std::vector<std::string> row = rawData[rowIndex];
+    return row[row.size()-1];
+}
+
 size_t Dataset::getInputCount()
 {
     return getColumnCount() - 1;
@@ -249,7 +260,6 @@ void Dataset::scale()
             if(columnCounter == columns.size()-1){
                 data[rowCounter][columnCounter] = cellValue;
             }else {
-                std::cout << cellValue << " " << minElement << " " << maxElement << std::endl;
                 data[rowCounter][columnCounter] = MathUtil::minMaxNormalization(cellValue, minElement, maxElement);
             }
 
@@ -260,6 +270,27 @@ void Dataset::scale()
     }
 
     scaled = true;
+}
+
+Dataset Dataset::splitTestData(size_t ratio)
+{
+    size_t splitSize = (ratio / 100.0) * data.size();
+
+    Matrix testData;
+    MatrixS unencodedtestData;
+
+    while (testData.size() < splitSize) {
+        srand((unsigned int)time(NULL));
+        size_t index = rand() % data.size();
+
+        testData.push_back(data[index]);
+        unencodedtestData.push_back(rawData[index]);
+
+        data.erase(data.begin() + index);
+        rawData.erase(rawData.begin() + index);
+    }
+
+    return Dataset(testData, unencodedtestData);
 }
 
 bool Dataset::validateDataset()

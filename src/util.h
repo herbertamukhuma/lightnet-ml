@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <string>
 
+#include "mathutil.h"
+
 namespace LightNet {
 
 class Util
@@ -16,6 +18,7 @@ public:
 
     static int find(std::vector<std::string> haystack, std::string needle);
 
+    static int findMax(std::vector<double> haystack);
 };
 
 }

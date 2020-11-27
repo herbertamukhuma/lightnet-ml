@@ -29,5 +29,11 @@ int Util::find(std::vector<std::string> haystack, std::string needle)
     }
 }
 
+int Util::findMax(std::vector<double> haystack)
+{
+    double max = MathUtil::maxElement(haystack);
+    return find(haystack, max);
+}
+
 // end of namespace
 }

@@ -12,6 +12,10 @@
 
 namespace LightNet {
 
+typedef std::vector<std::vector<double>> Matrix;
+
+typedef std::vector<std::vector<std::string>> MatrixS;
+
 class Dataset
 {
 public:
@@ -35,6 +39,8 @@ public:
 
     double getTarget(size_t rowIndex);
 
+    std::string getUnencodedTarget(size_t rowIndex);
+
     size_t getInputCount();
 
     size_t getUniqueTargetCount();
@@ -45,14 +51,18 @@ public:
 
     void scale();
 
+    Dataset splitTestData(size_t ratio);
+
 private:
+    Dataset(Matrix data, MatrixS rawData);
+
     bool loaded = false;
 
     bool scaled = false;
 
     std::vector<std::vector<std::string>> rawData;
 
-    std::vector<std::vector<double>> data;
+    Matrix data;
 
     void encodeTargets();
 

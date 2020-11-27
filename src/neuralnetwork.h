@@ -15,17 +15,29 @@ class NeuralNetwork
 public:
     NeuralNetwork(std::vector<size_t> architecture, Dataset dataset);
 
+    struct Prediction{
+        double predictedEncodedTarget;
+        std::string predictedUnencodedTarget;
+
+        double actualEncodedTarget;
+        std::string actualUnencodedTarget;
+
+        double confidence;
+    };
+
     std::vector<Layer> getLayers() const;
 
     std::vector<size_t> getArchitecture() const;
 
-    void train(size_t iterations = 5);
+    void train(size_t epochs = 5, double learningRate = 0.1);
 
     void printOutputs();
 
-private:
-    const double LEARNING_RATE = 0.1;
+    std::vector<Prediction> predict(Dataset predictionDataset);
 
+    bool save(std::string filename);
+
+private:
     std::vector<Layer> layers;
     std::vector<size_t> architecture;
 
@@ -37,7 +49,7 @@ private:
 
     double computeLoss(double target);
 
-    void backPropagation(double target);
+    void backPropagation(double target, double learningRate);
 
     int getTargetNeuronIndex(double target);
 

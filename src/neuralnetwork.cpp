@@ -19,16 +19,16 @@ std::vector<size_t> NeuralNetwork::getArchitecture() const
     return architecture;
 }
 
-void NeuralNetwork::train(size_t iterations)
+void NeuralNetwork::train(size_t epochs, double learningRate)
 {
-    for(size_t i = 0; i < iterations; i++){
+    for(size_t i = 0; i < epochs; i++){
 
         std::vector<double> losses;
 
         for(size_t x = 0; x < dataset.getRowCount(); x++){
             feedForward(dataset.getInputs(x));
             losses.push_back(computeLoss(dataset.getTarget(x)));
-            backPropagation(dataset.getTarget(x));
+            backPropagation(dataset.getTarget(x), learningRate);
         }
 
         std::cout << " -- loss #" << i + 1 << ": " << MathUtil::mean(losses) << std::endl;
@@ -48,6 +48,81 @@ void NeuralNetwork::printOutputs()
 
     std::cout << std::endl;
 
+}
+
+std::vector<NeuralNetwork::Prediction> NeuralNetwork::predict(Dataset predictionDataset)
+{
+    std::vector<Prediction> predictions;
+
+    for(size_t x = 0; x < predictionDataset.getRowCount(); x++){
+
+        feedForward(predictionDataset.getInputs(x));
+
+        Layer outputLayer = layers[layers.size() - 1];
+
+        std::vector<double> outputs;
+
+        for(Neuron neuron : outputLayer.getNeurons()){
+            outputs.push_back(neuron.getOutput());
+        }
+
+        double max = MathUtil::maxElement(outputs);
+        int maxIndex = Util::findMax(outputs);
+
+        Prediction prediction;
+        prediction.predictedUnencodedTarget = dataset.getUniqueUnencodedTargets()[maxIndex];
+        prediction.predictedEncodedTarget = dataset.getUniqueTargets()[maxIndex];
+        prediction.actualUnencodedTarget = predictionDataset.getUnencodedTarget(x);
+        prediction.actualEncodedTarget = predictionDataset.getTarget(x);
+        prediction.confidence = max;
+
+        predictions.push_back(prediction);
+    }
+
+    return predictions;
+}
+
+bool NeuralNetwork::save(std::string filename)
+{
+    std::ofstream out;
+
+    out.open(filename, std::ios::out | std::ios::trunc);
+
+    if(!out.is_open()){
+        std::cerr << " -- unable to open file at: " << filename << std::endl;
+        return false;
+    }
+
+    for(Layer layer : layers){
+
+        out << layer.getNeurons()[0].getWeights().size() << ",";
+
+        size_t neuronCounter = 0;
+
+        for(Neuron neuron : layer.getNeurons()){
+
+            size_t weightCounter = 0;
+
+            for(double weight : neuron.getWeights()){
+
+                if(weightCounter == neuron.getWeights().size() - 1 && neuronCounter == layer.getNeurons().size() - 1){
+                    out << weight;
+                }else {
+                    out << weight << ",";
+                }
+
+                weightCounter++;
+            }
+
+            neuronCounter++;
+        }
+
+        out << "\n";
+    }
+
+    out.close();
+
+    return true;
 }
 
 void NeuralNetwork::buildNetwork()
@@ -121,7 +196,7 @@ double NeuralNetwork::computeLoss(double target)
     return MathUtil::mse(activationPairs);
 }
 
-void NeuralNetwork::backPropagation(double target)
+void NeuralNetwork::backPropagation(double target, double learningRate)
 {
     int targetNeuronIndex = getTargetNeuronIndex(target);
 
@@ -176,7 +251,7 @@ void NeuralNetwork::backPropagation(double target)
 
                     double weightDeriv = costFuncDerivs[neuronCounter] * MathUtil::sigmoidDeriv(neuron.getOutput()) * activations[weightCounter];
 
-                    double newWeight = weight - (LEARNING_RATE * weightDeriv);
+                    double newWeight = weight - (learningRate * weightDeriv);
 
                     layer.updateWeight(neuronCounter, weightCounter, newWeight);
 
@@ -218,7 +293,7 @@ void NeuralNetwork::backPropagation(double target)
 
                     double weightDeriv = cumulativeDeriv * MathUtil::sigmoidDeriv(neuron.getOutput()) * activations[weightCounter];
 
-                    double newWeight = weight - (LEARNING_RATE * weightDeriv);
+                    double newWeight = weight - (learningRate * weightDeriv);
                     layer.updateWeight(neuronCounter, weightCounter, newWeight);
 
                     double nextCumulativeDeriv = cumulativeDeriv * MathUtil::sigmoidDeriv(neuron.getOutput()) * weight;
