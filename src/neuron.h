@@ -42,6 +42,8 @@ public:
 
     double getBias() const;
 
+    void setWeights(const std::vector<double> value);
+
 protected:
     std::vector<double> weights;
 

@@ -9,6 +9,11 @@ NeuralNetwork::NeuralNetwork(std::vector<size_t> architecture, Dataset dataset) 
     buildNetwork();
 }
 
+NeuralNetwork::NeuralNetwork()
+{
+    dataset = Dataset();
+}
+
 std::vector<Layer> NeuralNetwork::getLayers() const
 {
     return layers;
@@ -71,7 +76,7 @@ std::vector<NeuralNetwork::Prediction> NeuralNetwork::predict(Dataset prediction
 
         Prediction prediction;
         prediction.predictedUnencodedTarget = dataset.getUniqueUnencodedTargets()[maxIndex];
-        prediction.predictedEncodedTarget = dataset.getUniqueTargets()[maxIndex];
+        prediction.predictedEncodedTarget = dataset.getUniqueEncodedTargets()[maxIndex];
         prediction.actualUnencodedTarget = predictionDataset.getUnencodedTarget(x);
         prediction.actualEncodedTarget = predictionDataset.getTarget(x);
         prediction.confidence = max;
@@ -84,45 +89,132 @@ std::vector<NeuralNetwork::Prediction> NeuralNetwork::predict(Dataset prediction
 
 bool NeuralNetwork::save(std::string filename)
 {
-    std::ofstream out;
 
-    out.open(filename, std::ios::out | std::ios::trunc);
+    QJsonObject model;
 
-    if(!out.is_open()){
+    // save weights
+    QJsonArray nnWeights;
+
+    for(Layer layer : layers){
+
+        QJsonArray layerNeuronWeights;
+
+        for(Neuron neuron : layer.getNeurons()){
+
+            QJsonArray neuronWeights;
+
+            for(double weight : neuron.getWeights()){
+                neuronWeights.append(weight);
+            }
+
+            layerNeuronWeights.append(neuronWeights);
+        }
+
+        nnWeights.append(layerNeuronWeights);
+    }
+
+    model.insert("weights", nnWeights);
+
+    // dataset metadata
+
+    QJsonObject datasetMetadata;
+
+    QJsonArray encodedTargets;
+
+    for(double target : dataset.getUniqueEncodedTargets()){
+        encodedTargets.append(target);
+    }
+
+    QJsonArray unencodedTargets;
+
+    for(std::string target : dataset.getUniqueUnencodedTargets()){
+        unencodedTargets.append(QString::fromStdString(target));
+    }
+
+    datasetMetadata.insert("encoded_targets", encodedTargets);
+    datasetMetadata.insert("unencoded_targets", unencodedTargets);
+
+    model.insert("dataset_metadata", datasetMetadata);
+
+    // save to file
+    QFile modelFile(QString::fromStdString(filename));
+
+    if(!modelFile.open(QIODevice::WriteOnly | QIODevice::Truncate)){
         std::cerr << " -- unable to open file at: " << filename << std::endl;
         return false;
     }
 
-    for(Layer layer : layers){
+    modelFile.write(QJsonDocument(model).toJson());
 
-        out << layer.getNeurons()[0].getWeights().size() << ",";
-
-        size_t neuronCounter = 0;
-
-        for(Neuron neuron : layer.getNeurons()){
-
-            size_t weightCounter = 0;
-
-            for(double weight : neuron.getWeights()){
-
-                if(weightCounter == neuron.getWeights().size() - 1 && neuronCounter == layer.getNeurons().size() - 1){
-                    out << weight;
-                }else {
-                    out << weight << ",";
-                }
-
-                weightCounter++;
-            }
-
-            neuronCounter++;
-        }
-
-        out << "\n";
-    }
-
-    out.close();
+    modelFile.close();
 
     return true;
+}
+
+NeuralNetwork NeuralNetwork::loadModel(std::string filename)
+{
+    NeuralNetwork net;
+
+    QFile modelFile(QString::fromStdString(filename));
+
+    if(!modelFile.open(QIODevice::ReadOnly)){
+        std::cerr << " -- unable to open file at: " << filename << std::endl;
+        return net;
+    }
+
+    QJsonObject model = QJsonDocument::fromJson(modelFile.readAll()).object();
+
+    modelFile.close();
+
+    // populate weights
+    QJsonArray nnWeights = model["weights"].toArray();
+
+    for(QJsonValueRef layerNeuronWeightsRef : nnWeights){
+
+        QJsonArray layerNeuronWeights = layerNeuronWeightsRef.toArray();
+
+        Layer layer;
+
+        for(QJsonValueRef neuronWeightsRef : layerNeuronWeights){
+
+            QJsonArray neuronWeights = neuronWeightsRef.toArray();
+
+            Neuron neuron;
+
+            for(QJsonValueRef weightRef : neuronWeights){
+                neuron.addWeight(weightRef.toDouble());
+            }
+
+            layer.addNeuron(neuron);
+        }
+
+        net.layers.push_back(layer);
+    }
+
+    // populate dataset
+    QJsonObject datasetMetadata = model["dataset_metadata"].toObject();
+
+    QJsonArray encodedTargets = datasetMetadata["encoded_targets"].toArray();
+
+    std::vector<double> encodedTargetsVec;
+
+    for(QJsonValueRef targetRef : encodedTargets){
+        encodedTargetsVec.push_back(targetRef.toDouble());
+    }
+
+    net.dataset.setUniqueEncodedTargets(encodedTargetsVec);
+
+    QJsonArray unencodedTargets = datasetMetadata["unencoded_targets"].toArray();
+
+    std::vector<std::string> unencodedTargetsVec;
+
+    for(QJsonValueRef targetRef : encodedTargets){
+        unencodedTargetsVec.push_back(targetRef.toString().toStdString());
+    }
+
+    net.dataset.setUniqueUnencodedTargets(unencodedTargetsVec);
+
+    return net;
 }
 
 void NeuralNetwork::buildNetwork()
@@ -315,7 +407,7 @@ void NeuralNetwork::backPropagation(double target, double learningRate)
 
 int NeuralNetwork::getTargetNeuronIndex(double target)
 {
-    std::vector<double> targets = dataset.getUniqueTargets();
+    std::vector<double> targets = dataset.getUniqueEncodedTargets();
 
     // get the neuron index representing 'target'
     return Util::find(targets, target);

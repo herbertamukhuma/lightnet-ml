@@ -15,8 +15,10 @@ int main()
 
     Dataset testData = dataset.splitTestData(5);
 
-    NeuralNetwork net({dataset.getInputCount(), 10, dataset.getUniqueTargetCount()}, dataset);
-    net.train(500);
+//    NeuralNetwork net({dataset.getInputCount(), 4, dataset.getUniqueTargetCount()}, dataset);
+//    net.train(500);
+
+    NeuralNetwork net = NeuralNetwork::loadModel("/Users/user/GitHub/lightnet-ml/data/model.json");
 
     std::vector<NeuralNetwork::Prediction> predictions = net.predict(testData);
 
@@ -24,9 +26,11 @@ int main()
         cout << "Predicted: " << prediction.predictedEncodedTarget << " Actual: " << prediction.actualEncodedTarget << " Conf: " << prediction.confidence << endl;
     }
 
-    net.save("/Users/user/GitHub/lightnet-ml/data/model.csv");
-
-    std::cout << "done" << std::endl;
+//    if(net.save("/Users/user/GitHub/lightnet-ml/data/model.json")){
+//        std::cout << "saved!" << std::endl;
+//    }else {
+//        std::cout << "failed to save!" << std::endl;
+//    }
 
     return 0;
 }
