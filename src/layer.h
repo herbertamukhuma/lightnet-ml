@@ -15,6 +15,8 @@ public:
 
     Layer(size_t numberOfNeurons, size_t numberOfActivationsPerNeuron);
 
+    Layer();
+
     void print();
 
     bool setActivations(std::vector<double> activations, size_t positionInNet);
@@ -22,6 +24,8 @@ public:
     std::vector<double> compute();
 
     std::vector<LightNet::Neuron> getNeurons() const;
+
+    void addNeuron(Neuron neuron);
 
     void updateWeight(size_t neuronIndex, size_t weightIndex, double newWeight);
 

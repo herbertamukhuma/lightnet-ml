@@ -3,6 +3,11 @@
 
 #include <vector>
 
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QFile>
+
 #include "layer.h"
 #include "dataset.h"
 #include "util.h"
@@ -14,6 +19,8 @@ class NeuralNetwork
 
 public:
     NeuralNetwork(std::vector<size_t> architecture, Dataset dataset);
+
+    NeuralNetwork();
 
     struct Prediction{
         double predictedEncodedTarget;
@@ -36,6 +43,8 @@ public:
     std::vector<Prediction> predict(Dataset predictionDataset);
 
     bool save(std::string filename);
+
+    static NeuralNetwork loadModel(std::string filename);
 
 private:
     std::vector<Layer> layers;

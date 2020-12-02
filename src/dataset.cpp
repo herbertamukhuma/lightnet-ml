@@ -7,9 +7,33 @@ Dataset::Dataset(std::string filename, bool hasHeadings, char delimiter)
     load(filename, hasHeadings, delimiter);
 }
 
+Dataset::Dataset(MatrixS data)
+{
+    rawData = data;
+
+    encodeTargets();
+
+    loaded = validateDataset();
+}
+
+Dataset::Dataset()
+{
+
+}
+
 Dataset::Dataset(Matrix data, MatrixS rawData) : rawData(rawData), data(data)
 {
 
+}
+
+void Dataset::setUniqueEncodedTargets(const std::vector<double> &value)
+{
+    uniqueEncodedTargets = value;
+}
+
+void Dataset::setUniqueUnencodedTargets(const std::vector<std::string> &value)
+{
+    uniqueUnencodedTargets = value;
 }
 
 void Dataset::load(std::string filename, bool hasHeadings, char delimiter)
@@ -121,7 +145,7 @@ void Dataset::print()
 
 void Dataset::printTargets()
 {
-    std::vector<double> targets = getTargets();
+    std::vector<double> targets = getEncodedTargets();
 
     for(double &target : targets){
         std::cout << target << std::endl;
@@ -130,14 +154,14 @@ void Dataset::printTargets()
 
 void Dataset::printUniqueTargets()
 {
-    std::vector<double> uniqueTargets = getUniqueTargets();
+    std::vector<double> uniqueTargets = getUniqueEncodedTargets();
 
     for(double &uniqueTarget : uniqueTargets){
         std::cout << uniqueTarget << std::endl;
     }
 }
 
-std::vector<double> Dataset::getTargets()
+std::vector<double> Dataset::getEncodedTargets()
 {
     std::vector<double> targets;
 
@@ -149,8 +173,12 @@ std::vector<double> Dataset::getTargets()
     return targets;
 }
 
-std::vector<double> Dataset::getUniqueTargets()
+std::vector<double> Dataset::getUniqueEncodedTargets()
 {
+    if(!uniqueEncodedTargets.empty()){
+        return uniqueEncodedTargets;
+    }
+
     std::vector<double> uniqueTargets;
 
     // targets are in the last column
@@ -169,6 +197,10 @@ std::vector<double> Dataset::getUniqueTargets()
 
 std::vector<std::string> Dataset::getUniqueUnencodedTargets()
 {
+    if(!uniqueUnencodedTargets.empty()){
+        return uniqueUnencodedTargets;
+    }
+
     std::vector<std::string> uniqueTargets;
 
     // targets are in the last column
@@ -211,7 +243,7 @@ size_t Dataset::getInputCount()
 
 size_t Dataset::getUniqueTargetCount()
 {
-    return getUniqueTargets().size();
+    return getUniqueEncodedTargets().size();
 }
 
 size_t Dataset::getRowCount()

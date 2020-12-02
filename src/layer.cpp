@@ -7,6 +7,11 @@ Layer::Layer(size_t numberOfNeurons, size_t numberOfActivationsPerNeuron)
     init(numberOfNeurons, numberOfActivationsPerNeuron);
 }
 
+Layer::Layer()
+{
+
+}
+
 void Layer::print()
 {
     std::cout << "### LAYER ###" << std::endl;
@@ -105,6 +110,11 @@ void Layer::init(size_t numberOfNeurons, size_t numberOfActivationsPerNeuron)
 std::vector<LightNet::Neuron> Layer::getNeurons() const
 {
     return neurons;
+}
+
+void Layer::addNeuron(Neuron neuron)
+{
+    neurons.push_back(neuron);
 }
 
 void Layer::updateWeight(size_t neuronIndex, size_t weightIndex, double newWeight)

@@ -77,5 +77,10 @@ double Neuron::getBias() const
     return bias;
 }
 
+void Neuron::setWeights(const std::vector<double> value)
+{
+    weights = value;
+}
+
 // end of namespace
 }

@@ -21,6 +21,10 @@ class Dataset
 public:
     Dataset(std::string filename, bool hasHeadings = false, char delimiter = ',');
 
+    Dataset(MatrixS data);
+
+    Dataset();
+
     bool isLoaded() const;
 
     void print();
@@ -29,9 +33,9 @@ public:
 
     void printUniqueTargets();
 
-    std::vector<double> getTargets();
+    std::vector<double> getEncodedTargets();
 
-    std::vector<double> getUniqueTargets();
+    std::vector<double> getUniqueEncodedTargets();
 
     std::vector<std::string> getUniqueUnencodedTargets();
 
@@ -53,6 +57,10 @@ public:
 
     Dataset splitTestData(size_t ratio);
 
+    void setUniqueUnencodedTargets(const std::vector<std::string> &value);
+
+    void setUniqueEncodedTargets(const std::vector<double> &value);
+
 private:
     Dataset(Matrix data, MatrixS rawData);
 
@@ -61,6 +69,10 @@ private:
     bool scaled = false;
 
     std::vector<std::vector<std::string>> rawData;
+
+    std::vector<double> uniqueEncodedTargets;
+
+    std::vector<std::string> uniqueUnencodedTargets;
 
     Matrix data;
 
