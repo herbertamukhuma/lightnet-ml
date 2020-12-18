@@ -6,6 +6,7 @@
 #include <sstream>
 #include <vector>
 #include <iostream>
+#include <ctime>
 
 #include "util.h"
 #include "mathutil.h"
