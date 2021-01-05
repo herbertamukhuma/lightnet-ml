@@ -13,7 +13,7 @@ class Layer
 {
 public:
 
-    Layer(size_t numberOfNeurons, size_t numberOfActivationsPerNeuron);
+    Layer(size_t numberOfNeurons, size_t numberOfActivationsPerNeuron, Neuron::ActivationFunction activationFunction);
 
     Layer();
 
@@ -32,7 +32,7 @@ public:
     void updateBias(size_t neuronIndex, double newBias);
 
 protected:
-    void init(size_t numberOfNeurons, size_t numberOfActivationsPerNeuron);
+    void init(size_t numberOfNeurons, size_t numberOfActivationsPerNeuron, Neuron::ActivationFunction activationFunction);
 
     std::vector<LightNet::Neuron> neurons;
 };

@@ -1,30 +1,30 @@
-#include "neuralnetwork.h"
+#include "nnclassifier.h"
 
 namespace LightNet {
 
-NeuralNetwork::NeuralNetwork(std::vector<size_t> architecture, Dataset dataset) :
+NNClassifier::NNClassifier(std::vector<size_t> architecture, Dataset dataset) :
     architecture(architecture),
     dataset(dataset)
 {
     buildNetwork();
 }
 
-NeuralNetwork::NeuralNetwork()
+NNClassifier::NNClassifier()
 {
     dataset = Dataset();
 }
 
-std::vector<Layer> NeuralNetwork::getLayers() const
+std::vector<Layer> NNClassifier::getLayers() const
 {
     return layers;
 }
 
-std::vector<size_t> NeuralNetwork::getArchitecture() const
+std::vector<size_t> NNClassifier::getArchitecture() const
 {
     return architecture;
 }
 
-void NeuralNetwork::train(size_t epochs, double learningRate)
+void NNClassifier::train(size_t epochs, double learningRate)
 {
     for(size_t i = 0; i < epochs; i++){
 
@@ -41,7 +41,7 @@ void NeuralNetwork::train(size_t epochs, double learningRate)
 
 }
 
-void NeuralNetwork::printOutputs()
+void NNClassifier::printOutputs()
 {
     Layer &outputLayer = layers[layers.size() - 1];
 
@@ -55,7 +55,7 @@ void NeuralNetwork::printOutputs()
 
 }
 
-std::vector<NeuralNetwork::Prediction> NeuralNetwork::predict(Dataset predictionDataset)
+std::vector<NNClassifier::Prediction> NNClassifier::predict(Dataset predictionDataset)
 {
     std::vector<Prediction> predictions;
 
@@ -87,7 +87,7 @@ std::vector<NeuralNetwork::Prediction> NeuralNetwork::predict(Dataset prediction
     return predictions;
 }
 
-bool NeuralNetwork::save(std::string filename)
+bool NNClassifier::save(std::string filename)
 {
 
     QJsonObject model;
@@ -151,9 +151,9 @@ bool NeuralNetwork::save(std::string filename)
     return true;
 }
 
-NeuralNetwork NeuralNetwork::loadModel(std::string filename)
+NNClassifier NNClassifier::loadModel(std::string filename)
 {
-    NeuralNetwork net;
+    NNClassifier net;
 
     QFile modelFile(QString::fromStdString(filename));
 
@@ -179,7 +179,7 @@ NeuralNetwork NeuralNetwork::loadModel(std::string filename)
 
             QJsonArray neuronWeights = neuronWeightsRef.toArray();
 
-            Neuron neuron;
+            Neuron neuron(Neuron::Sigmoid);
 
             for(QJsonValueRef weightRef : neuronWeights){
                 neuron.addWeight(weightRef.toDouble());
@@ -217,7 +217,7 @@ NeuralNetwork NeuralNetwork::loadModel(std::string filename)
     return net;
 }
 
-void NeuralNetwork::buildNetwork()
+void NNClassifier::buildNetwork()
 {
     size_t counter = 0;
 
@@ -225,12 +225,12 @@ void NeuralNetwork::buildNetwork()
 
         if(counter == 0){
             // in the first layer, each neuron has only one input
-            Layer layer(numberOfNeurons,1);
+            Layer layer(numberOfNeurons, 1, Neuron::Sigmoid);
             layers.push_back(layer);
         }else {
             // in subsequent layers, the number of inputs for each
             // neuron equals the number of neurons in prevoius layer
-            Layer layer(numberOfNeurons, architecture[counter-1]);
+            Layer layer(numberOfNeurons, architecture[counter-1], Neuron::Sigmoid);
             layers.push_back(layer);
         }
 
@@ -238,7 +238,7 @@ void NeuralNetwork::buildNetwork()
     }
 }
 
-void NeuralNetwork::feedForward(std::vector<double> activations)
+void NNClassifier::feedForward(std::vector<double> activations)
 {
 
     size_t counter = 0;
@@ -254,7 +254,7 @@ void NeuralNetwork::feedForward(std::vector<double> activations)
     }
 }
 
-double NeuralNetwork::computeLoss(double target)
+double NNClassifier::computeLoss(double target)
 {
     int targetNeuronIndex = getTargetNeuronIndex(target);
 
@@ -288,7 +288,7 @@ double NeuralNetwork::computeLoss(double target)
     return MathUtil::mse(activationPairs);
 }
 
-void NeuralNetwork::backPropagation(double target, double learningRate)
+void NNClassifier::backPropagation(double target, double learningRate)
 {
     int targetNeuronIndex = getTargetNeuronIndex(target);
 
@@ -405,7 +405,7 @@ void NeuralNetwork::backPropagation(double target, double learningRate)
     }
 }
 
-int NeuralNetwork::getTargetNeuronIndex(double target)
+int NNClassifier::getTargetNeuronIndex(double target)
 {
     std::vector<double> targets = dataset.getUniqueEncodedTargets();
 

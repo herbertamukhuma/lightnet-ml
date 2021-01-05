@@ -311,8 +311,9 @@ Dataset Dataset::splitTestData(size_t ratio)
     Matrix testData;
     MatrixS unencodedtestData;
 
-    while (testData.size() < splitSize) {
-        srand((unsigned int)time(NULL));
+    srand((unsigned int)time(NULL));
+
+    while (testData.size() < splitSize) {        
         size_t index = rand() % data.size();
 
         testData.push_back(data[index]);

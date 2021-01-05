@@ -15,6 +15,8 @@ public:
 
     static double sigmoid(double input);
 
+    static double relu(double input);
+
     static double mse(std::vector<std::tuple<double, double>> inputPairs);
 
     static double mean(std::vector<double> inputs);
@@ -24,6 +26,8 @@ public:
     static double minElement(std::vector<double> elements);
 
     static double sigmoidDeriv(double value);
+
+    static double reluDeriv(double value);
 
     static double minMaxNormalization(double inputElement, double minElement, double maxElement);
 };

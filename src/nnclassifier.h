@@ -1,5 +1,5 @@
-#ifndef NEURALNETWORK_H
-#define NEURALNETWORK_H
+#ifndef NNCLASSIFIER_H
+#define NNCLASSIFIER_H
 
 #include <vector>
 
@@ -14,13 +14,14 @@
 
 namespace LightNet {
 
-class NeuralNetwork
+class NNClassifier
 {
 
 public:
-    NeuralNetwork(std::vector<size_t> architecture, Dataset dataset);
 
-    NeuralNetwork();
+    NNClassifier(std::vector<size_t> architecture, Dataset dataset);
+
+    NNClassifier();
 
     struct Prediction{
         double predictedEncodedTarget;
@@ -44,7 +45,7 @@ public:
 
     bool save(std::string filename);
 
-    static NeuralNetwork loadModel(std::string filename);
+    static NNClassifier loadModel(std::string filename);
 
 private:
     std::vector<Layer> layers;
@@ -66,4 +67,4 @@ private:
 
 }
 
-#endif // NEURALNETWORK_H
+#endif // NNCLASSIFIER_H

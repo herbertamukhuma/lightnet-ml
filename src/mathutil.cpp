@@ -18,6 +18,11 @@ double MathUtil::sigmoid(double input)
     return 1 / (1 + exp(-input));
 }
 
+double MathUtil::relu(double input)
+{
+    return std::max(0.0, input);
+}
+
 double MathUtil::mse(std::vector<std::tuple<double, double> > inputPairs)
 {
 
@@ -66,6 +71,15 @@ double MathUtil::minElement(std::vector<double> elements)
 double MathUtil::sigmoidDeriv(double value)
 {
     return value * (1.0 - value);
+}
+
+double MathUtil::reluDeriv(double value)
+{
+    if(value >= 0){
+        return 1;
+    }else {
+        return 0;
+    }
 }
 
 double MathUtil::minMaxNormalization(double inputElement, double minElement, double maxElement)

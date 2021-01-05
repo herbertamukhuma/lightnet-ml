@@ -2,9 +2,9 @@
 
 namespace LightNet {
 
-Layer::Layer(size_t numberOfNeurons, size_t numberOfActivationsPerNeuron)
+Layer::Layer(size_t numberOfNeurons, size_t numberOfActivationsPerNeuron, Neuron::ActivationFunction activationFunction)
 {
-    init(numberOfNeurons, numberOfActivationsPerNeuron);
+    init(numberOfNeurons, numberOfActivationsPerNeuron, activationFunction);
 }
 
 Layer::Layer()
@@ -91,11 +91,11 @@ std::vector<double> Layer::compute()
     return  computedNeuronOutputs;
 }
 
-void Layer::init(size_t numberOfNeurons, size_t numberOfActivationsPerNeuron)
+void Layer::init(size_t numberOfNeurons, size_t numberOfActivationsPerNeuron, Neuron::ActivationFunction activationFunction)
 {
     for(size_t i = 0; i < numberOfNeurons; i++)
     {
-        Neuron neuron;
+        Neuron neuron(activationFunction);
 
         for(size_t i2 = 0; i2 < numberOfActivationsPerNeuron; i2++){
             neuron.addWeight(neuron.generateRandomWeight());

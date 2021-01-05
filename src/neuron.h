@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <vector>
 #include <iostream>
+#include <ctime>
 
 #include "mathutil.h"
 #include "util.h"
@@ -13,14 +14,15 @@ namespace LightNet {
 class Neuron
 {
 public:
-    Neuron();
 
-    enum WeightUpdateDirection{
-        Up = 0,
-        Down = 1
+    enum ActivationFunction{
+        Sigmoid = 0,
+        Relu = 1
     };
 
-    static double generateRandomWeight();
+    Neuron(ActivationFunction activationFunction);
+
+    double generateRandomWeight();
 
     void addWeight(double weight);
 
@@ -45,6 +47,9 @@ public:
     void setWeights(const std::vector<double> value);
 
 protected:
+
+    ActivationFunction activationFunction;
+
     std::vector<double> weights;
 
     std::vector<double> inputActivations;
@@ -52,6 +57,8 @@ protected:
     double output = 0;
 
     double bias;
+
+    bool seeded = false;
 
 };
 

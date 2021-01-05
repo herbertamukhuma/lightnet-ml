@@ -2,14 +2,20 @@
 
 namespace LightNet {
 
-Neuron::Neuron()
+Neuron::Neuron(ActivationFunction activationFunction) :
+    activationFunction(activationFunction)
 {
 
 }
 
 double Neuron::generateRandomWeight()
-{
-    return ((double)rand()) / RAND_MAX;
+{   
+    if(!seeded){
+        seeded = true;
+        srand((unsigned int)time(NULL));
+    }
+
+    return ((double)rand()) / RAND_MAX;    
 }
 
 void Neuron::addWeight(double weight)
@@ -51,7 +57,15 @@ double Neuron::compute()
 
     double sum = MathUtil::sum(activationWeightProducts); // + bias;
 
-    output = MathUtil::sigmoid(sum);
+    if(activationFunction == Relu){
+        output = MathUtil::relu(sum);
+    }else if(activationFunction == Sigmoid){
+        output = MathUtil::sigmoid(sum);
+    }else {
+        output = 0;
+        std::cerr << " -- invalid activation function" << std::endl;
+    }
+
 
     return output;
 

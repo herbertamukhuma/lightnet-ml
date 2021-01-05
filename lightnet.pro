@@ -8,14 +8,14 @@ SOURCES += \
         src/dataset.cpp \
         src/layer.cpp \
         src/mathutil.cpp \
-        src/neuralnetwork.cpp \
         src/neuron.cpp \
+        src/nnclassifier.cpp \
         src/util.cpp
 
 HEADERS += \
     src/dataset.h \
     src/layer.h \
     src/mathutil.h \
-    src/neuralnetwork.h \
     src/neuron.h \
+    src/nnclassifier.h \
     src/util.h
