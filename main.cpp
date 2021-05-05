@@ -23,8 +23,8 @@ void trainAndSave(){
 
     Dataset testData = dataset.splitTestData(5);
 
-    NNClassifier net({dataset.getInputCount(), 4, dataset.getUniqueTargetCount()}, dataset);
-    net.train(500);
+    NNClassifier net({dataset.getInputCount(), 10, dataset.getUniqueTargetCount()}, dataset);
+    net.train(1000);
 
     std::vector<NNClassifier::Prediction> predictions = net.predict(testData);
 
