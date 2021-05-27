@@ -96,7 +96,8 @@ Proceed as follows:
     }
 
     ```
-As you may have noted, my dataset is stored in my computer at the path **"D:/GitHub/lightnet-ml/data/iris_flowers.csv"**. Please replace this with the path where your data set is stored.
+    As you may have noted, my dataset is stored in my computer at the path **"D:/GitHub/lightnet-ml/data/iris_flowers.csv"**. Please replace this with the path where your data       set is stored.
+
 5. The next thing to do is to split the data into traing and testing data. We do so using the **splitTestData** function, which takes a percentage value, representing the percentage of the data that will be used for testing. In our case, we use **5**, which means that 5 percent of the data will be allocated for testing. The function then returns the split data from the original dataset. This means that the original dataset reduces in size die to the data split from it.
 
     ```
@@ -151,3 +152,111 @@ As you may have noted, my dataset is stored in my computer at the path **"D:/Git
     }
 
     ```
+7. As you may have already guessed, we now proceed to training. We use the **train** function, and specify the number of epochs we want. This value also varies depending of factors such as accuracy and time.
+
+    ```
+    #include <iostream>
+    
+    #include "src/dataset.h"
+    #include "src/nnclassifier.h"
+
+    using namespace std;
+    using namespace LightNet;
+
+    void trainAndSave();
+    
+    int main()
+    {
+        return 0;
+    }
+    
+    void trainAndSave(){
+        Dataset dataset("D:/GitHub/lightnet-ml/data/iris_flowers.csv", true);
+        dataset.scale();
+        
+        Dataset testData = dataset.splitTestData(5);
+        
+        NNClassifier net({dataset.getInputCount(), 10, dataset.getUniqueTargetCount()}, dataset);
+        net.train(1000);
+    }
+
+    ```
+8. With the training done, we now proceed to make predeictions. We use the **predict** function and supply the test data we split earlier. The **NNClassifier::Prediction** structure will store each prediction and so we use a vector to store the multiple predictions. We then loop through the predictions printing information such as: **predicted class**, the **actual class** and the **confidence** 
+
+    ```
+    #include <iostream>
+    
+    #include "src/dataset.h"
+    #include "src/nnclassifier.h"
+
+    using namespace std;
+    using namespace LightNet;
+
+    void trainAndSave();
+    
+    int main()
+    {
+        return 0;
+    }
+    
+    void trainAndSave(){
+        Dataset dataset("D:/GitHub/lightnet-ml/data/iris_flowers.csv", true);
+        dataset.scale();
+        
+        Dataset testData = dataset.splitTestData(5);
+        
+        NNClassifier net({dataset.getInputCount(), 10, dataset.getUniqueTargetCount()}, dataset);
+        net.train(1000);
+        
+        std::vector<NNClassifier::Prediction> predictions = net.predict(testData);
+
+        for(NNClassifier::Prediction prediction : predictions){
+            cout << "Predicted: " << prediction.predictedEncodedTarget << " Actual: " << prediction.actualEncodedTarget << " Conf: " << prediction.confidence << endl;
+        }
+    }
+
+    ```
+9. Lastly we save the model for use in a production or real environment. We use the save function to achieve this. The model is saved as a json file which is easy to load and process. You can also open it and explore!!!!
+Below is the complete code with the save function. Also, don't forget to call the **trainAndSave** function from the main function
+
+    ```
+    #include <iostream>
+    
+    #include "src/dataset.h"
+    #include "src/nnclassifier.h"
+
+    using namespace std;
+    using namespace LightNet;
+
+    void trainAndSave();
+    
+    int main()
+    {
+        trainAndSave();
+        return 0;
+    }
+    
+    void trainAndSave(){
+        Dataset dataset("D:/GitHub/lightnet-ml/data/iris_flowers.csv", true);
+        dataset.scale();
+        
+        Dataset testData = dataset.splitTestData(5);
+        
+        NNClassifier net({dataset.getInputCount(), 10, dataset.getUniqueTargetCount()}, dataset);
+        net.train(1000);
+        
+        std::vector<NNClassifier::Prediction> predictions = net.predict(testData);
+
+        for(NNClassifier::Prediction prediction : predictions){
+            cout << "Predicted: " << prediction.predictedEncodedTarget << " Actual: " << prediction.actualEncodedTarget << " Conf: " << prediction.confidence << endl;
+        }
+        
+        if(net.save("D:/GitHub/lightnet-ml/data/model.json")){
+            std::cout << "saved!" << std::endl;
+        }else {
+            std::cout << "failed to save!" << std::endl;
+        }
+    }
+
+    ```
+10. We've come to the end of this example and thank you for reading through. In the main.cpp file, you will also find an example of how to load an already trained model. Feel free to go through it. Thanks
