@@ -309,7 +309,7 @@ Dataset Dataset::splitTestData(size_t ratio)
     size_t splitSize = (ratio / 100.0) * data.size();
 
     Matrix testData;
-    MatrixS unencodedtestData;
+    MatrixS rawTestData;
 
     srand((unsigned int)time(NULL));
 
@@ -317,13 +317,13 @@ Dataset Dataset::splitTestData(size_t ratio)
         size_t index = rand() % data.size();
 
         testData.push_back(data[index]);
-        unencodedtestData.push_back(rawData[index]);
+        rawTestData.push_back(rawData[index]);
 
         data.erase(data.begin() + index);
         rawData.erase(rawData.begin() + index);
     }
 
-    return Dataset(testData, unencodedtestData);
+    return Dataset(testData, rawTestData);
 }
 
 bool Dataset::validateDataset()

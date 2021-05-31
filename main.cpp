@@ -2,7 +2,6 @@
 
 #include "src/nnclassifier.h"
 #include "src/dataset.h"
-#include "src/mathutil.h"
 
 using namespace std;
 using namespace LightNet;
