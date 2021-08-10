@@ -98,7 +98,7 @@ Proceed as follows:
     ```
     As you may have noted, my dataset is stored in my computer at the path **"D:/GitHub/lightnet-ml/data/iris_flowers.csv"**. Please replace this with the path where your data       set is stored.
 
-5. The next thing to do is to split the data into traing and testing data. We do so using the **splitTestData** function, which takes a percentage value, representing the percentage of the data that will be used for testing. In our case, we use **5**, which means that 5 percent of the data will be allocated for testing. The function then returns the split data from the original dataset. This means that the original dataset reduces in size die to the data split from it.
+5. The next thing to do is to split the data into traing and testing data. We do so using the **splitTestData** function, which takes a percentage value, representing the percentage of the data that will be used for testing. In our case, we use **5**, which means that 5 percent of the data will be allocated for testing. The function then returns the split data from the original dataset. This means that the original dataset reduces in size due to the data split from it.
 
     ```
     #include <iostream>
